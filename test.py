@@ -15,6 +15,10 @@ Y = 1000
 BEGIN_X = 220
 END_X = 440
 
+LIGHTS = 4
+ACTIVE_BRI = 0
+DIM_BRI = 0
+
 def get_health(ox, oy):
   for x in range(BEGIN_X, END_X):
     r, g, b = pixel_at(ox+x, oy+Y)
@@ -40,22 +44,22 @@ def main():
     if hp == last_hp:
       continue
 
-    last_hp = hp
-
     if hp <= 0.0:
       print 'you\'re a shitter'
-      hue = 0.75 * 65536
-      bri = 127
+      bri = DIM_BRI
+      hue = int(0.75 * 65536)
     else:
       print 'you\'re at %.2f' % hp
-      bri = 254
+      bri = ACTIVE_BRI
       hue = int(hp * 65536 / 3.0)
 
     try:
-      bridge.set_light(8, {'hue': hue, 'bri': bri}, transitiontime=0)
+      bridge.set_light(LIGHTS, {'hue': hue, 'bri': bri}, transitiontime=0)
+      last_hp = hp
     except phue.PhueRequestTimeout:
       print 'timed out'
-      pass
+    except Exception:
+      print 'network sucked'
 
     time.sleep(0.1)
 
